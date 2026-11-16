@@ -1,0 +1,57 @@
+name: Trading Bots (Paper)
+
+on:
+  schedule:
+    # Mo-Fr 21:30 UTC = nach US-Boersenschluss (22:30 Uhr deutscher Winterzeit)
+    - cron: "30 21 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Testlauf: nur anzeigen, keine Orders senden"
+        type: boolean
+        default: true
+      force:
+        description: "Auch ohne heutige Kurse laufen (nur zum Testen am Wochenende)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency: trading-bots
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+      FORCE: ${{ github.event_name == 'workflow_dispatch' && inputs.force }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Logik-Tests
+        run: python tests/test_strategies.py
+      - name: Bot Fels (sicher)
+        env:
+          ALPACA_FELS_KEY: ${{ secrets.ALPACA_FELS_KEY }}
+          ALPACA_FELS_SECRET: ${{ secrets.ALPACA_FELS_SECRET }}
+        run: python bot.py fels
+      - name: Bot Rakete (aggressiv)
+        if: always()
+        env:
+          ALPACA_RAKETE_KEY: ${{ secrets.ALPACA_RAKETE_KEY }}
+          ALPACA_RAKETE_SECRET: ${{ secrets.ALPACA_RAKETE_SECRET }}
+        run: python bot.py rakete
+      - name: Protokolle speichern
+        if: always()
+        run: |
+          git config user.name "trading-bots"
+          git config user.email "actions@users.noreply.github.com"
+          git add logs/
+          git diff --cached --quiet || git commit -m "Log $(date -u +%F)"
+          git push

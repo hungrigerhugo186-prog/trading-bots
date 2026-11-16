@@ -1,0 +1,95 @@
+name: Daytrading Falke + Rakete (Paper)
+
+# Ein Boersentag dauert 6,5 Stunden, ein GitHub-Job darf hoechstens 6 Stunden laufen.
+# Deshalb zwei Jobs pro Bot:
+#   vormittag  = wartet auf die Boersenoeffnung, handelt bis 12:00 Uhr New York
+#   nachmittag = uebernimmt danach, pflegt die Positionen und schliesst alles um 15:50 Uhr
+# Der Bot liest seinen Stand in jeder Minute neu von Alpaca, der zweite Job macht nahtlos weiter.
+
+on:
+  schedule:
+    # Mo-Fr 12:45 UTC = 07:45 Uhr (Winter) bzw. 08:45 Uhr (Sommer) New York, also immer
+    # deutlich VOR der Boersenoeffnung um 09:30. Der Bot wartet selbst, bis es losgeht.
+    - cron: "45 12 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "DRY_RUN: nur anzeigen, keine Orders senden"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+env:
+  DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+
+jobs:
+  vormittag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 345
+    strategy:
+      fail-fast: false
+      matrix:
+        bot: [falke, rakete]
+    concurrency:
+      group: daytrading-${{ matrix.bot }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Tests (bei einem Fehler startet der Bot nicht)
+        run: |
+          python tests/test_strategies.py
+          python tests/test_orb.py
+          python tests/test_daybot.py
+          python tests/test_bericht.py
+      - name: Bot ${{ matrix.bot }} - Vormittag
+        env:
+          ALPACA_FALKE_KEY: ${{ secrets.ALPACA_FALKE_KEY }}
+          ALPACA_FALKE_SECRET: ${{ secrets.ALPACA_FALKE_SECRET }}
+          ALPACA_RAKETE_KEY: ${{ secrets.ALPACA_RAKETE_KEY }}
+          ALPACA_RAKETE_SECRET: ${{ secrets.ALPACA_RAKETE_SECRET }}
+        run: python daybot.py ${{ matrix.bot }} --bis 12:00
+      - name: Protokolle speichern
+        if: always()
+        run: bash scripts/save_logs.sh "Protokoll ${{ matrix.bot }} Vormittag"
+
+  nachmittag:
+    needs: vormittag
+    if: always()            # laeuft auch, wenn der Vormittag fehlgeschlagen ist (Positionen schliessen!)
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        bot: [falke, rakete]
+    concurrency:
+      group: daytrading-${{ matrix.bot }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Bot ${{ matrix.bot }} - Nachmittag bis Zwangsschluss
+        env:
+          ALPACA_FALKE_KEY: ${{ secrets.ALPACA_FALKE_KEY }}
+          ALPACA_FALKE_SECRET: ${{ secrets.ALPACA_FALKE_SECRET }}
+          ALPACA_RAKETE_KEY: ${{ secrets.ALPACA_RAKETE_KEY }}
+          ALPACA_RAKETE_SECRET: ${{ secrets.ALPACA_RAKETE_SECRET }}
+        # Ende-Code 2 = nach dem Zwangsschluss ist noch eine Position offen -> Job schlaegt fehl
+        run: python daybot.py ${{ matrix.bot }}
+      - name: Protokolle speichern
+        if: always()
+        run: bash scripts/save_logs.sh "Protokoll ${{ matrix.bot }} Tagesende"

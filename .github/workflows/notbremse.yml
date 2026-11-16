@@ -1,0 +1,38 @@
+name: Konto-Notbremse freigeben
+
+# Nur von Hand starten: gibt einen Daytrading-Bot wieder frei, nachdem die
+# Konto-Notbremse ausgeloest hat. Der heutige Kontowert wird der neue Hoechststand.
+
+on:
+  workflow_dispatch:
+    inputs:
+      bot:
+        description: "Welcher Bot soll wieder handeln duerfen?"
+        type: choice
+        options: [falke, rakete]
+
+permissions:
+  contents: write
+
+jobs:
+  freigeben:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Notbremse freigeben
+        env:
+          ALPACA_FALKE_KEY: ${{ secrets.ALPACA_FALKE_KEY }}
+          ALPACA_FALKE_SECRET: ${{ secrets.ALPACA_FALKE_SECRET }}
+          ALPACA_RAKETE_KEY: ${{ secrets.ALPACA_RAKETE_KEY }}
+          ALPACA_RAKETE_SECRET: ${{ secrets.ALPACA_RAKETE_SECRET }}
+        run: python daybot.py ${{ inputs.bot }} --freigeben
+      - name: Zustand speichern
+        run: bash scripts/save_logs.sh "Notbremse ${{ inputs.bot }} freigegeben"

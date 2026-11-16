@@ -1,0 +1,67 @@
+name: Fels + Abendkontrolle (Paper)
+
+on:
+  schedule:
+    # Mo-Fr 21:30 UTC = nach US-Boersenschluss (Sommer wie Winter)
+    - cron: "30 21 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "DRY_RUN: nur anzeigen, keine Orders senden"
+        type: boolean
+        default: true
+      force:
+        description: "Auch ohne heutige Kurse laufen (nur zum Testen am Wochenende)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency: fels
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+      FORCE: ${{ github.event_name == 'workflow_dispatch' && inputs.force }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Tests
+        run: |
+          python tests/test_strategies.py
+          python tests/test_orb.py
+          python tests/test_daybot.py
+          python tests/test_bericht.py
+      - name: Bot Fels
+        env:
+          ALPACA_FELS_KEY: ${{ secrets.ALPACA_FELS_KEY }}
+          ALPACA_FELS_SECRET: ${{ secrets.ALPACA_FELS_SECRET }}
+        run: python bot.py fels
+      - name: Abendkontrolle Falke (schlaegt fehl, wenn noch eine Position offen ist)
+        if: always()
+        env:
+          ALPACA_FALKE_KEY: ${{ secrets.ALPACA_FALKE_KEY }}
+          ALPACA_FALKE_SECRET: ${{ secrets.ALPACA_FALKE_SECRET }}
+        run: python daybot.py falke --kontrolle
+      - name: Abendkontrolle Rakete (schlaegt fehl, wenn noch eine Position offen ist)
+        if: always()
+        env:
+          ALPACA_RAKETE_KEY: ${{ secrets.ALPACA_RAKETE_KEY }}
+          ALPACA_RAKETE_SECRET: ${{ secrets.ALPACA_RAKETE_SECRET }}
+        run: python daybot.py rakete --kontrolle
+      - name: Bericht aktualisieren
+        if: always()
+        run: python bericht.py
+      - name: Protokolle speichern
+        if: always()
+        run: bash scripts/save_logs.sh "Protokoll Fels und Bericht"

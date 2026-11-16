@@ -1,0 +1,13 @@
+# Geheime Schluessel - NIEMALS hochladen
+.env
+
+# Lokale Python-Umgebung und Zwischenspeicher
+.venv/
+__pycache__/
+*.pyc
+
+# Heruntergeladene Kursdaten fuer den Backtest (gross, jederzeit neu ladbar)
+data/
+
+# Nachgespielte Tage (nur zum Anschauen)
+logs/replay/

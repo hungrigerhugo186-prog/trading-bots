@@ -1,0 +1,43 @@
+﻿Lade Minutenkerzen (IEX) fuer 121 Symbole, 2025-10-01 bis 2026-11-15 ...
+.\.venv\Scripts\python.exe : C:\Users\User\Desktop\ClaudeBrainV2\Projekte\Trading-Bots\backtest.py:345: 
+DeprecationWarning: Asset.easy_to_borrow is deprecated and will be removed in the next release. Use borrow_status 
+instead.
+In Zeile:1 Zeichen:335
++ ...  = "utf-8"; .\.venv\Scripts\python.exe -u backtest.py --feed iex *> r ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Users\User\D...status instead.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  known[s] = bool(a.shortable and a.easy_to_borrow)
+Short erlaubt (shortable + easy-to-borrow, Stand heute): 121 von 121 Symbolen
+
+Zeitraum: 2025-11-17 bis 2026-11-13 (250 Handelstage), Daten: IEX, Slippage 0.05 % pro Order
+
+=== Falke ===
+Ausstiege: Kursziel 17, Stop 81, Zwangsschluss 42
+-> Konto-Notbremse am 2026-02-27 ausgeloest - danach wurde nicht mehr gehandelt.
+-> Die Strategie verliert im Schnitt Geld pro Trade (-0.24 R).
+-> Schlechter als 'SPY einfach halten' (-5.0 % gegen 12.6 %).
+
+=== Rakete ===
+Ausstiege: Nachgezogener Stop 6, Not-Ziel 5R 1, Stop 101, Zwangsschluss 158
+-> Konto-Notbremse am 2026-05-19 ausgeloest - danach wurde nicht mehr gehandelt.
+-> Die Strategie verliert im Schnitt Geld pro Trade (-0.11 R).
+-> Schlechter als 'SPY einfach halten' (-20.6 % gegen 12.6 %).
+
+                                  Falke         Rakete     davon Long    davon Short     SPY halten
+Trades                              140            266            149            117               
+Trefferquote                     35.0 %         45.9 %         43.6 %         48.7 %               
+Schnitt pro Trade              -0.239 R       -0.108 R       -0.158 R       -0.043 R               
+Summe                           -33.5 R        -28.6 R        -23.5 R         -5.1 R               
+Profit-Faktor                      0.64           0.79           0.68           0.93               
+Gewinn/Verlust                   -503 $        -2064 $        -1788 $         -276 $               
+Geplantes Risiko/Trade           0.16 %         0.89 %         0.90 %         0.88 %               
+Ergebnis                        -5.03 %       -20.64 %                                     +12.64 %
+Max. Drawdown                    5.03 %        26.63 %                                       9.13 %
+Kontostand                       9497 $         7936 $                                      11264 $
+
+Berichte liegen in reports/.
+Hinweise: Die Aktienlisten und der Short-Status sind von heute (Aktien, die inzwischen
+abgestuerzt sind, fehlen evtl. -> Ergebnis eher zu gut). Leihgebuehren und Zinsen fuer
+Kredit sind nicht eingerechnet. Vergangene Ergebnisse sagen nichts Sicheres ueber die Zukunft.

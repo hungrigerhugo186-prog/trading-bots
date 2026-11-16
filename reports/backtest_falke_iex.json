@@ -1,0 +1,76 @@
+{
+  "run": "falke",
+  "feed": "iex",
+  "from": "2025-11-17",
+  "to": "2026-11-13",
+  "slippage": 0.0005,
+  "stats": {
+    "trades": 140,
+    "win_rate": 0.35,
+    "avg_r": -0.23909444879680503,
+    "total_r": -33.473222831552704,
+    "profit_factor": 0.6359596683994974,
+    "pnl_usd": -502.94738749996975,
+    "avg_risk_pct": 0.1638962673146343,
+    "return_pct": -5.029473874999635,
+    "max_drawdown_pct": 5.029473874999635,
+    "end_equity": 9497.052612500036,
+    "long": {
+      "trades": 140,
+      "win_rate": 0.35,
+      "avg_r": -0.23909444879680503,
+      "total_r": -33.473222831552704,
+      "profit_factor": 0.6359596683994974,
+      "pnl_usd": -502.94738749996975,
+      "avg_risk_pct": 0.1638962673146343
+    },
+    "short": {
+      "trades": 0,
+      "win_rate": 0.0,
+      "avg_r": 0.0,
+      "total_r": 0,
+      "profit_factor": null,
+      "pnl_usd": 0,
+      "avg_risk_pct": 0.0
+    }
+  },
+  "exit_reasons": {
+    "Stop": 81,
+    "Zwangsschluss": 42,
+    "Kursziel": 17
+  },
+  "halted_on": "2026-02-27",
+  "spy_buy_and_hold": {
+    "return_pct": 12.635610874256153,
+    "max_drawdown_pct": 9.131166161057036,
+    "end_equity": 11263.561087425614
+  },
+  "verdict": [
+    "Konto-Notbremse am 2026-02-27 ausgeloest - danach wurde nicht mehr gehandelt.",
+    "Die Strategie verliert im Schnitt Geld pro Trade (-0.24 R).",
+    "Schlechter als 'SPY einfach halten' (-5.0 % gegen 12.6 %)."
+  ],
+  "rules": {
+    "universe": "MEGA_CAPS",
+    "sides": [
+      "long"
+    ],
+    "leverage": 1.0,
+    "range_minutes": 15,
+    "min_range_pct": 0.003,
+    "last_entry": "11:30",
+    "stop_mode": "mid",
+    "target_r": 2.0,
+    "risk_pct": 0.0025,
+    "max_trades_per_day": 2,
+    "max_pos_pct": 0.25,
+    "daily_loss_limit": 0.0075,
+    "dd_halt": 0.05,
+    "min_gap_pct": null,
+    "min_rel_volume": null,
+    "min_short_price": null,
+    "runner_fraction": 0.0,
+    "runner_target_r": null,
+    "trail_r": null
+  }
+}

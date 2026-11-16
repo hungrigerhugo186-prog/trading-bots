@@ -1,0 +1,78 @@
+{
+  "run": "rakete",
+  "feed": "iex",
+  "from": "2025-11-17",
+  "to": "2026-11-13",
+  "slippage": 0.0005,
+  "stats": {
+    "trades": 266,
+    "win_rate": 0.45864661654135336,
+    "avg_r": -0.10761700336143741,
+    "total_r": -28.626122894142352,
+    "profit_factor": 0.7853256393383411,
+    "pnl_usd": -2063.5676074998983,
+    "avg_risk_pct": 0.8893093901244163,
+    "return_pct": -20.635676074998997,
+    "max_drawdown_pct": 26.628326561389994,
+    "end_equity": 7936.4323925001,
+    "long": {
+      "trades": 149,
+      "win_rate": 0.436241610738255,
+      "avg_r": -0.157987246494788,
+      "total_r": -23.54009972772341,
+      "profit_factor": 0.681000222902775,
+      "pnl_usd": -1787.8506249999464,
+      "avg_risk_pct": 0.8979273521837224
+    },
+    "short": {
+      "trades": 117,
+      "win_rate": 0.48717948717948717,
+      "avg_r": -0.0434702834736662,
+      "total_r": -5.086023166418945,
+      "profit_factor": 0.9312082814459053,
+      "pnl_usd": -275.7169824999519,
+      "avg_risk_pct": 0.8783343786129921
+    }
+  },
+  "exit_reasons": {
+    "Stop": 101,
+    "Zwangsschluss": 158,
+    "Nachgezogener Stop": 6,
+    "Not-Ziel 5R": 1
+  },
+  "halted_on": "2026-05-19",
+  "spy_buy_and_hold": {
+    "return_pct": 12.635610874256153,
+    "max_drawdown_pct": 9.131166161057036,
+    "end_equity": 11263.561087425614
+  },
+  "verdict": [
+    "Konto-Notbremse am 2026-05-19 ausgeloest - danach wurde nicht mehr gehandelt.",
+    "Die Strategie verliert im Schnitt Geld pro Trade (-0.11 R).",
+    "Schlechter als 'SPY einfach halten' (-20.6 % gegen 12.6 %)."
+  ],
+  "rules": {
+    "universe": "GROWTH",
+    "sides": [
+      "long",
+      "short"
+    ],
+    "leverage": 2.0,
+    "range_minutes": 5,
+    "min_range_pct": 0.003,
+    "last_entry": "11:30",
+    "stop_mode": "far",
+    "target_r": 2.0,
+    "risk_pct": 0.01,
+    "max_trades_per_day": 4,
+    "max_pos_pct": 0.5,
+    "daily_loss_limit": 0.03,
+    "dd_halt": 0.25,
+    "min_gap_pct": 0.02,
+    "min_rel_volume": 2.0,
+    "min_short_price": 10.0,
+    "runner_fraction": 0.5,
+    "runner_target_r": 5.0,
+    "trail_r": 1.0
+  }
+}
